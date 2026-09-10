@@ -115,7 +115,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     throw new Error(`Unknown tool: ${name}`);
   }
 
-  const toolFn = tools[name as keyof typeof tools] as (params?: any) => any;
+  const toolFn = tools[name as keyof typeof tools] as (params?: unknown) => { success: boolean; data: unknown };
   const result = toolFn(args);
 
   return {

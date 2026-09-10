@@ -19,17 +19,17 @@ interface Edge {
 }
 
 export default function NodeGraph() {
-  const [nodes, setNodes] = useState<Node[]>([
+  const [nodes] = useState<Node[]>([
     { id: 'src', label: 'Knowledge', subtitle: 'Retrieved', status: 'completed', type: 'src' },
     { id: 'ctrl', label: 'Orchestrator', subtitle: 'Idle', status: 'idle', type: 'ctrl' },
     { id: 'mcp', label: 'MCP', subtitle: '0 used', status: 'idle', type: 'mcp' },
     { id: 'tool1', label: 'get_technical_skills', subtitle: 'Return structured technical skills', status: 'idle', type: 'tool' },
     { id: 'tool2', label: 'search_projects', subtitle: 'Search or list public projects', status: 'idle', type: 'tool' },
-    { id: 'tool3', label: 'get_experience', subtitle: 'Return work history and roles', status: 'idle', type: 'tool' },
+    { id: 'tool3', label: 'get_experience', subtitle: 'Return work history / roles', status: 'idle', type: 'tool' },
     { id: 'tool4', label: 'get_dukaanx_project', subtitle: 'Details on the DukaanX SaaS product', status: 'idle', type: 'tool' },
   ]);
 
-  const [edges, setEdges] = useState<Edge[]>([
+  const [edges] = useState<Edge[]>([
     { from: 'src', to: 'ctrl', label: 'facts', active: false },
     { from: 'ctrl', to: 'tool1', label: 'tool', active: false },
     { from: 'ctrl', to: 'tool2', label: 'tool', active: false },
@@ -55,16 +55,6 @@ export default function NodeGraph() {
     return positions[id] || { x: 0, y: 0 };
   };
 
-  const getTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      src: 'SRC',
-      ctrl: 'CTRL',
-      mcp: 'MCP',
-      tool: 'TOOL'
-    };
-    return labels[type] || type.toUpperCase();
-  };
-
   return (
     <div className="relative w-full h-full">
       <svg className="absolute inset-0 w-full h-full">
@@ -81,14 +71,14 @@ export default function NodeGraph() {
                 y1={from.y}
                 x2={to.x}
                 y2={to.y}
-                stroke={edge.active ? 'var(--color-accent)' : 'var(--color-line-2)'}
+                stroke={edge.active ? '#5eead4' : '#1a1f22'}
                 strokeWidth={edge.active ? 2 : 1}
                 strokeDasharray={edge.active ? '5,5' : 'none'}
                 animate={edge.active ? {
                   strokeDashoffset: [0, -10]
                 } : {}}
                 transition={{
-                  duration: 0.5,
+                  duration: 1,
                   repeat: Infinity,
                   ease: 'linear'
                 }}
@@ -97,10 +87,10 @@ export default function NodeGraph() {
                 <text
                   x={midX}
                   y={midY - 5}
-                  fill="var(--color-accent)"
+                  fill="#5eead4"
                   fontSize="10"
                   textAnchor="middle"
-                  style={{ fontFamily: 'var(--font-mono)' }}
+                  className="font-mono"
                 >
                   {edge.label}
                 </text>
@@ -115,7 +105,7 @@ export default function NodeGraph() {
         return (
           <motion.div
             key={node.id}
-            className="absolute panel p-3 rounded-sm"
+            className="absolute border border-[#1a1f22] bg-[#0a0e0f] p-3 rounded"
             style={{
               left: pos.x - 80,
               top: pos.y - 25,
@@ -125,36 +115,31 @@ export default function NodeGraph() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="flex justify-between items-start mb-1">
-              <span className="text-[9px] tracking-wider" style={{ color: 'var(--color-mute)' }}>
-                {getTypeLabel(node.type)}
-              </span>
-              <div className="flex items-center gap-1">
-                <motion.div
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{
-                    background: node.status === 'completed' ? 'var(--color-accent)' :
-                           node.status === 'thinking' ? 'var(--color-accent)' :
-                           'var(--color-line-2)'
-                  }}
-                  animate={node.status === 'thinking' ? {
-                    scale: [1, 1.5, 1],
-                    opacity: [1, 0.5, 1]
-                  } : {}}
-                  transition={{
-                    duration: 0.8,
-                    repeat: Infinity
-                  }}
-                />
-                <span className="text-[9px]" style={{ color: 'var(--color-mute)' }}>
-                  {node.status === 'completed' ? 'COMPLETED' :
-                   node.status === 'thinking' ? 'Thinking…' :
-                   'Idle'}
-                </span>
-              </div>
+            <div className="flex items-center gap-2 mb-1">
+              <motion.div
+                className={`w-2 h-2 rounded-full ${
+                  node.status === 'completed' ? 'bg-[#5eead4]' :
+                  node.status === 'thinking' ? 'bg-[#5eead4] animate-pulse' :
+                  'bg-gray-600'
+                }`}
+                animate={node.status === 'thinking' ? {
+                  scale: [1, 1.5, 1],
+                  opacity: [1, 0.5, 1]
+                } : {}}
+                transition={{
+                  duration: 0.8,
+                  repeat: Infinity
+                }}
+              />
+              <span className="text-xs font-bold text-white">{node.label}</span>
             </div>
-            <p className="text-xs font-bold text-white mb-0.5">{node.label}</p>
-            <p className="text-[10px] truncate" style={{ color: 'var(--color-fog)' }}>{node.subtitle}</p>
+            <p className="text-[10px] text-gray-500 truncate">{node.subtitle}</p>
+            {node.status === 'completed' && (
+              <p className="text-[9px] text-[#5eead4] mt-1">COMPLETED</p>
+            )}
+            {node.status === 'thinking' && (
+              <p className="text-[9px] text-[#5eead4] mt-1">Thinking...</p>
+            )}
           </motion.div>
         );
       })}

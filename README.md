@@ -14,7 +14,7 @@ An agentic runtime portfolio site that presents resume data as callable "tools" 
 
 - **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
 - **Animations**: Framer Motion
-- **LLM**: Claude API (Anthropic) via server-side proxy with tool calling
+- **LLM**: OpenRouter API with Llama 3 model
 - **MCP**: Node MCP SDK for Claude Desktop integration
 
 ## Setup
@@ -26,10 +26,10 @@ npm install
 
 2. Create a `.env.local` file in the project root:
 ```bash
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
+OPENROUTER_API_KEY=your_openrouter_api_key_here
 ```
 
-Get an API key at https://console.anthropic.com/
+Get an API key at https://openrouter.ai/keys
 
 3. Run the development server:
 ```bash
