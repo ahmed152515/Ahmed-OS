@@ -871,7 +871,7 @@ function HomeContent() {
         )}
 
         {mobileTab === 'ask' && (
-          <div className="flex flex-col h-[calc(100vh-120px)]">
+          <div className="flex flex-col h-[calc(100vh-90px)]">
             <div className="flex-1 overflow-y-auto p-4 pb-0">
               {messages.length === 0 && (
                 <div className="space-y-2 mb-4">
