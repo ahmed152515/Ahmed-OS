@@ -94,6 +94,8 @@ function sanitizeResponse(response: string): string {
 
 export async function POST(req: NextRequest) {
   console.log('[API /chat] Request received');
+  console.log('[API /chat] OPENROUTER_API_KEY exists:', !!process.env.OPENROUTER_API_KEY);
+  console.log('[API /chat] OPENROUTER_API_KEY length:', process.env.OPENROUTER_API_KEY?.length || 0);
   
   try {
     const { question } = await req.json();
