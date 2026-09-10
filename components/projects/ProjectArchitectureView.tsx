@@ -99,17 +99,17 @@ function ArchitectureNode({ data }: { data: PortfolioArchitectureNode }) {
           
           {/* Title and Description */}
           <div className="flex-1 min-w-0">
-            <div className="text-base font-semibold text-white truncate leading-tight" style={{ textShadow: `0 0 10px ${colors.glow}` }}>{data.label}</div>
-            <div className="text-[11px] text-gray-500 truncate uppercase tracking-wide mb-1">{data.category}</div>
-            <div className="text-[12px] text-gray-400 truncate leading-tight">{colors.description}</div>
+            <div className="text-lg font-semibold text-white truncate leading-tight" style={{ textShadow: `0 0 10px ${colors.glow}` }}>{data.label}</div>
+            <div className="text-[13px] text-gray-500 truncate uppercase tracking-wide mb-1">{data.category}</div>
+            <div className="text-[14px] text-gray-400 truncate leading-tight">{colors.description}</div>
           </div>
           
           {/* Square badge with data */}
           <div 
-            className="w-9 h-9 rounded flex items-center justify-center flex-shrink-0"
+            className="w-10 h-10 rounded flex items-center justify-center flex-shrink-0"
             style={{ backgroundColor: `${colors.bg}20`, border: `1px solid ${colors.border}` }}
           >
-            <span className="text-[10px] font-bold" style={{ color: colors.bg }}>DATA</span>
+            <span className="text-[11px] font-bold" style={{ color: colors.bg }}>DATA</span>
           </div>
         </div>
       </div>

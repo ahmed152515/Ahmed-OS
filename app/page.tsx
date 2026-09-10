@@ -32,6 +32,9 @@ function HomeContent() {
   const [systemMode, setSystemMode] = useState<SystemMode>('portfolio');
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [hasWokenUp, setHasWokenUp] = useState(false);
+  const [showLanding, setShowLanding] = useState(true);
+  const [showAboutPanel, setShowAboutPanel] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'profile' | 'runtime' | 'ask'>('ask');
   const eventsEndRef = useRef<HTMLDivElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
   
@@ -80,22 +83,17 @@ function HomeContent() {
     scrollToBottom();
   }, [events]);
 
-  // System wake-up animation on initial load
+  // System wake-up animation on initial load - only run once
   useEffect(() => {
     if (hasWokenUp) return;
     
     const wakeUpSequence = async () => {
-      // Add system wake-up events
-      const wakeUpEvents: Event[] = [
+      // Add system wake-up events only once
+      setEvents([
         { type: 'SYSTEM_INIT', timestamp: new Date().toISOString(), message: 'Initializing Ahmed OS...' },
         { type: 'GRAPH_INIT', timestamp: new Date().toISOString(), message: 'Loading architecture map...' },
         { type: 'SYSTEM_READY', timestamp: new Date().toISOString(), message: 'System ready' }
-      ];
-      
-      for (const event of wakeUpEvents) {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        setEvents(prev => [...prev, event]);
-      }
+      ]);
       
       // Activate default nodes briefly
       setActiveNode('user');
@@ -109,7 +107,7 @@ function HomeContent() {
     };
     
     wakeUpSequence();
-  }, [hasWokenUp, setActiveNode, setCompletedNode]);
+  }, []); // Empty dependency array - only run once
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -319,53 +317,226 @@ function HomeContent() {
 
   return (
     <div className="min-h-screen bg-[#0a0e0f] text-[#e5e5e5] font-mono grid-bg">
-      {/* TOP BAR */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#1a1f22]">
-        <div className="flex items-center gap-3">
-          <span className="text-xl font-bold text-white">AHMED OS</span>
-          <span className="text-xs text-gray-500 tracking-widest">FULL-STACK ENGINEER · AI/ML ENGINEER · AGENTIC AI DEVELOPER</span>
-        </div>
-        <div className="flex items-center gap-4 text-xs">
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="px-3 py-1 border border-[#1a1f22] rounded hover:border-[#5eead4] transition-colors"
-          >
-            How I built this?
-          </button>
-          <button 
-            onClick={handleRuntimeClick}
-            className={`px-3 py-1 border rounded transition-colors ${
-              systemMode === 'runtime' 
-                ? 'border-[#5eead4] bg-[#5eead4]/10 text-[#5eead4]' 
-                : 'border-[#1a1f22] hover:border-[#5eead4]'
-            }`}
-          >
-            RUNTIME
-          </button>
-          <button 
-            onClick={handleAgentClick}
-            className={`px-3 py-1 border rounded transition-colors ${
-              systemMode === 'agent' 
-                ? 'border-[#5eead4] bg-[#5eead4]/10 text-[#5eead4]' 
-                : 'border-[#1a1f22] hover:border-[#5eead4]'
-            }`}
-          >
-            AGENT
-          </button>
-          <span className="text-gray-500">SESSION ACTIVE</span>
-          <button className="px-3 py-1 border border-[#1a1f22] rounded hover:border-[#5eead4] transition-colors">
-            MCP /mcp
-          </button>
-          <Settings className="w-4 h-4 text-gray-500 hover:text-[#5eead4] cursor-pointer" />
-          <div className="flex items-center gap-2 px-3 py-1 bg-[#5eead4]/10 border border-[#5eead4]/30 rounded">
-            <div className="w-2 h-2 bg-[#5eead4] rounded-full animate-pulse" />
-            <span className="text-[#5eead4] font-bold">LIVE</span>
+      {/* LANDING PAGE */}
+      {showLanding && (
+        <div className="fixed inset-0 bg-[#0a0e0f] z-50 flex items-center justify-center">
+          <div className="text-center max-w-2xl px-6">
+            <p className="text-xl text-gray-400 mb-1 tracking-widest">AhmedOS// Agent Runtime</p>
+            <h2 className="text-4xl font-bold text-white mb-4">AHMED ABBAS</h2>
+            <p className="text-lg text-gray-400 mb-2">Full Stack AI Engineer</p>
+            <p className="text-sm text-gray-500 mb-6">React · Cloudflare · Generative AI</p>
+            <p className="text-base text-gray-300 mb-8 max-w-lg mx-auto">
+              I build software, AI systems and products end-to-end.
+            </p>
+            <p className="text-sm text-gray-400 mb-8 italic">
+              This isn't a portfolio that tells you about me. It's a system that lets you investigate me.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <button 
+                onClick={() => setShowAboutPanel(!showAboutPanel)}
+                className="px-8 py-3 bg-[#5eead4] text-black font-bold rounded hover:bg-[#4dd4c4] transition-colors"
+              >
+                {showAboutPanel ? 'Hide Me' : 'About Me'}
+              </button>
+              <button 
+                onClick={() => {
+                  setShowLanding(false);
+                  handleAgentClick();
+                }}
+                className="px-8 py-3 border border-[#5eead4] text-[#5eead4] font-bold rounded hover:bg-[#5eead4]/10 transition-colors"
+              >
+                Ask my portfolio
+              </button>
+            </div>
           </div>
+        </div>
+      )}
+
+      {/* ABOUT ME PANEL - Slide in from right with same content as left panel - only show on landing page */}
+      {showAboutPanel && showLanding && (
+        <div className="fixed inset-0 z-[60]">
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowAboutPanel(false)}
+          />
+          <div className="absolute right-0 top-0 h-full w-96 bg-[#0a0e0f] border-l border-[#1a1f22] overflow-y-auto transform transition-transform">
+            <div className="px-4 py-3 border-b border-[#1a1f22] flex justify-between items-center">
+              <span className="text-xs text-gray-500 tracking-widest">OPERATOR</span>
+              <button 
+                onClick={() => setShowAboutPanel(false)}
+                className="px-3 py-1 text-xs border border-[#1a1f22] rounded hover:border-[#5eead4] hover:text-[#5eead4] transition-colors"
+              >
+                Hide Me
+              </button>
+            </div>
+            <div className="p-4">
+              <h2 className="text-3xl font-bold text-white mb-1">Ahmed</h2>
+              <p className="text-sm text-gray-400 mb-4">Ahmed Abbas</p>
+              <p className="text-[#5eead4] font-bold mb-1">FULL-STACK ENGINEER</p>
+              <p className="text-[#5eead4] font-bold mb-4 text-sm">AI / ML ENGINEER · AGENTIC AI DEVELOPER</p>
+              <p className="text-xs text-gray-500 mb-6">Pune, India · Immediate joiner</p>
+              
+              <p className="text-sm text-gray-300 mb-6 leading-relaxed">
+                Full-Stack Engineer and AI/ML Engineer with expertise in building scalable web applications, CRM systems, and AI-powered solutions. Proficient in React, Next.js, Python, Node.js, and modern cloud infrastructure. Experienced in agentic AI workflows, RAG architectures, MCP, and LLM applications. Strong background in distributed systems, serverless architecture, and multi-tenant SaaS development. Currently building DukaanX, a multi-tenant SaaS platform with AI-powered capabilities.
+              </p>
+
+              <div className="border-t border-[#1a1f22] pt-4 mb-6">
+                <div className="text-xs space-y-1">
+                  <p className="text-gray-400">📧 sayyedwp@gmail.com</p>
+                  <p className="text-gray-400">📱 +91 8530070721</p>
+                  <p className="text-gray-400">🔗 github.com/ahmed152515</p>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <span className="text-xs text-gray-500 tracking-widest block mb-3">CAPABILITIES</span>
+                <span className="text-xs text-gray-500 block mb-2">Languages</span>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {['C', 'C++', 'JavaScript', 'TypeScript', 'Python', 'SQL'].map((skill) => (
+                    <span key={skill} className="px-2 py-1 text-xs border border-[#1a1f22] rounded text-gray-300">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+                <span className="text-xs text-gray-500 block mb-2">Frontend</span>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {['React', 'Next.js', 'TypeScript', 'Tailwind CSS'].map((skill) => (
+                    <span key={skill} className="px-2 py-1 text-xs border border-[#1a1f22] rounded text-gray-300">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+                <span className="text-xs text-gray-500 block mb-2">Backend</span>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {['Node.js', 'Python', 'Flask', 'SQL'].map((skill) => (
+                    <span key={skill} className="px-2 py-1 text-xs border border-[#1a1f22] rounded text-gray-300">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+                <span className="text-xs text-gray-500 block mb-2">AI / ML</span>
+                <div className="flex flex-wrap gap-2">
+                  {['LLM Apps', 'RAG', 'MCP', 'LangChain'].map((skill) => (
+                    <span key={skill} className="px-2 py-1 text-xs border border-[#1a1f22] rounded text-gray-300">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <span className="text-xs text-gray-500 tracking-widest block mb-3">PROJECTS</span>
+                <div className="space-y-1">
+                  {projects.map((project) => (
+                    <button
+                      key={project.id}
+                      onClick={() => handleProjectClick(project.id)}
+                      className={`w-full text-left px-3 py-2 text-xs transition-all rounded-sm flex items-center gap-2 ${
+                        selectedProject === project.id
+                          ? 'bg-[#5eead4]/10 border border-[#5eead4]/30 text-[#5eead4]'
+                          : 'text-gray-400 hover:bg-[#1a1f22] hover:text-[#5eead4] border border-transparent'
+                      }`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        selectedProject === project.id 
+                          ? 'bg-[#5eead4] animate-pulse' 
+                          : project.status === 'In Development'
+                          ? 'bg-yellow-500'
+                          : 'bg-gray-600'
+                      }`} />
+                      <span>{project.name}</span>
+                      {project.highlight && (
+                        <span className="ml-auto text-[10px] text-[#5eead4]">★</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MOBILE TABS */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0a0e0f] border-t border-[#1a1f22] z-30">
+        <div className="flex">
+          <button
+            onClick={() => setMobileTab('profile')}
+            className={`flex-1 py-3 text-xs font-bold ${
+              mobileTab === 'profile' ? 'text-[#5eead4] border-t-2 border-[#5eead4]' : 'text-gray-500'
+            }`}
+          >
+            Profile
+          </button>
+          <button
+            onClick={() => setMobileTab('runtime')}
+            className={`flex-1 py-3 text-xs font-bold ${
+              mobileTab === 'runtime' ? 'text-[#5eead4] border-t-2 border-[#5eead4]' : 'text-gray-500'
+            }`}
+          >
+            Runtime
+          </button>
+          <button
+            onClick={() => setMobileTab('ask')}
+            className={`flex-1 py-3 text-xs font-bold ${
+              mobileTab === 'ask' ? 'text-[#5eead4] border-t-2 border-[#5eead4]' : 'text-gray-500'
+            }`}
+          >
+            Ask
+          </button>
         </div>
       </div>
 
-      {/* MAIN CONTENT - 3 COLUMN LAYOUT */}
-      <div className="flex gap-4 p-4 h-[calc(100vh-180px)]">
+      {/* MAIN CONTENT - Only show if landing is hidden */}
+      {!showLanding && (
+        <>
+          {/* TOP BAR - Desktop only */}
+          <div className="hidden md:flex items-center justify-between px-6 py-4 border-b border-[#1a1f22]">
+            <div className="flex items-center gap-3">
+              <span className="text-xl font-bold text-white">AHMED OS</span>
+              <span className="text-xs text-gray-500 tracking-widest">FULL-STACK ENGINEER · AI/ML ENGINEER · AGENTIC AI DEVELOPER</span>
+            </div>
+            <div className="flex items-center gap-4 text-xs">
+              <button 
+                onClick={() => setShowAboutPanel(true)}
+                className="px-3 py-1 border border-[#1a1f22] rounded hover:border-[#5eead4] transition-colors"
+              >
+                About Me
+              </button>
+              <button 
+                onClick={handleRuntimeClick}
+                className={`px-3 py-1 border rounded transition-colors ${
+                  systemMode === 'runtime' 
+                    ? 'border-[#5eead4] bg-[#5eead4]/10 text-[#5eead4]' 
+                    : 'border-[#1a1f22] hover:border-[#5eead4]'
+                }`}
+              >
+                RUNTIME
+              </button>
+              <button 
+                onClick={handleAgentClick}
+                className={`px-3 py-1 border rounded transition-colors ${
+                  systemMode === 'agent' 
+                    ? 'border-[#5eead4] bg-[#5eead4]/10 text-[#5eead4]' 
+                    : 'border-[#1a1f22] hover:border-[#5eead4]'
+                }`}
+              >
+                AGENT
+              </button>
+              <span className="text-gray-500">SESSION ACTIVE</span>
+              <button className="px-3 py-1 border border-[#1a1f22] rounded hover:border-[#5eead4] transition-colors">
+                MCP /mcp
+              </button>
+              <Settings className="w-4 h-4 text-gray-500 hover:text-[#5eead4] cursor-pointer" />
+              <div className="flex items-center gap-2 px-3 py-1 bg-[#5eead4]/10 border border-[#5eead4]/30 rounded">
+                <div className="w-2 h-2 bg-[#5eead4] rounded-full animate-pulse" />
+                <span className="text-[#5eead4] font-bold">LIVE</span>
+              </div>
+            </div>
+          </div>
+
+      {/* MAIN CONTENT - 3 COLUMN LAYOUT - Desktop */}
+      <div className="hidden md:flex gap-4 p-4 h-[calc(100vh-180px)]">
         {/* LEFT PANEL - OPERATOR */}
         <div className="w-80 flex flex-col border border-[#1a1f22] bg-[#0a0e0f]/50">
           <div className="px-4 py-3 border-b border-[#1a1f22]">
@@ -373,7 +544,7 @@ function HomeContent() {
           </div>
           <div className="p-4 flex-1 overflow-y-auto">
             <h2 className="text-3xl font-bold text-white mb-1">Ahmed</h2>
-            <p className="text-sm text-gray-400 mb-4">Ahmed Sayyed</p>
+            <p className="text-sm text-gray-400 mb-4">Ahmed Abbas</p>
             <p className="text-[#5eead4] font-bold mb-1">FULL-STACK ENGINEER</p>
             <p className="text-[#5eead4] font-bold mb-4 text-sm">AI / ML ENGINEER · AGENTIC AI DEVELOPER</p>
             <p className="text-xs text-gray-500 mb-6">Pune, India · Immediate joiner</p>
@@ -629,8 +800,150 @@ function HomeContent() {
         </div>
       </div>
 
+      {/* MOBILE CONTENT */}
+      <div className="md:hidden pb-16">
+        {mobileTab === 'profile' && (
+          <div className="p-4">
+            <h2 className="text-2xl font-bold text-white mb-2">Ahmed</h2>
+            <p className="text-sm text-gray-400 mb-4">Ahmed Abbas</p>
+            <p className="text-[#5eead4] font-bold mb-1">FULL-STACK ENGINEER</p>
+            <p className="text-[#5eead4] font-bold mb-4 text-sm">AI / ML ENGINEER · AGENTIC AI DEVELOPER</p>
+            <p className="text-xs text-gray-500 mb-6">Pune, India · Immediate joiner</p>
+            
+            <p className="text-sm text-gray-300 mb-6 leading-relaxed">
+              Full-Stack Engineer and AI/ML Engineer with expertise in building scalable web applications, CRM systems, and AI-powered solutions.
+            </p>
+
+            <div className="border-t border-[#1a1f22] pt-4 mb-6">
+              <div className="text-xs space-y-1">
+                <p className="text-gray-400">📧 sayyedwp@gmail.com</p>
+                <p className="text-gray-400">📱 +91 8530070721</p>
+                <p className="text-gray-400">🔗 github.com/ahmed152515</p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <span className="text-xs text-gray-500 tracking-widest block mb-3">CAPABILITIES</span>
+              <div className="flex flex-wrap gap-2">
+                {['React', 'Next.js', 'TypeScript', 'Python', 'Node.js', 'Cloudflare'].map((skill) => (
+                  <span key={skill} className="px-2 py-1 text-xs border border-[#1a1f22] rounded text-gray-300">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <span className="text-xs text-gray-500 tracking-widest block mb-3">PROJECTS</span>
+              <div className="space-y-1">
+                {projects.map((project) => (
+                  <button
+                    key={project.id}
+                    onClick={() => handleProjectClick(project.id)}
+                    className={`w-full text-left px-3 py-2 text-xs transition-all rounded-sm flex items-center gap-2 ${
+                      selectedProject === project.id
+                        ? 'bg-[#5eead4]/10 border border-[#5eead4]/30 text-[#5eead4]'
+                        : 'text-gray-400 hover:bg-[#1a1f22] hover:text-[#5eead4] border border-transparent'
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      selectedProject === project.id 
+                        ? 'bg-[#5eead4] animate-pulse' 
+                        : project.status === 'In Development'
+                        ? 'bg-yellow-500'
+                        : 'bg-gray-600'
+                    }`} />
+                    <span>{project.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {mobileTab === 'runtime' && (
+          <div className="h-[calc(100vh-140px)]">
+            <RuntimeGraph 
+              architecture={getCurrentArchitecture()}
+              onNodeClick={(nodeId) => setSelectedNode(nodeId)}
+            />
+          </div>
+        )}
+
+        {mobileTab === 'ask' && (
+          <div className="p-4 h-[calc(100vh-140px)] flex flex-col">
+            <div className="flex-1 overflow-y-auto mb-4">
+              <div className="space-y-2 mb-4">
+                <p className="text-xs text-gray-500 mb-2">Suggested questions:</p>
+                {[
+                  "What has he built at Risiar?",
+                  "Does he know Python and Flask?",
+                  "What is DukaanX?",
+                ].map((q, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setInput(q); }}
+                    className="w-full text-left px-3 py-2 text-xs border border-[#1a1f22] rounded hover:border-[#5eead4] hover:text-[#5eead4] transition-colors"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="space-y-3">
+                {messages.map((msg, i) => (
+                  <div key={i} className={`p-3 border rounded ${msg.role === 'visitor' ? 'border-[#5eead4]/30 bg-[#5eead4]/5' : 'border-[#1a1f22] bg-[#0a0e0f]'}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`text-xs font-bold ${msg.role === 'visitor' ? 'text-[#5eead4]' : 'text-gray-400'}`}>
+                        {msg.role.toUpperCase()}
+                      </span>
+                      <span className="text-[10px] text-gray-600">
+                        {new Date(msg.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-300">{msg.content}</p>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="p-3 border border-[#1a1f22] rounded bg-[#0a0e0f]">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-gray-400">AHMEDOS</span>
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-[#5eead4] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-2 h-2 bg-[#5eead4] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="w-2 h-2 bg-[#5eead4] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Ask the runtime…"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={isLoading}
+                className="flex-1 bg-[#0a0e0f] border border-[#1a1f22] rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#5eead4] disabled:opacity-50"
+              />
+              <button 
+                onClick={handleSend}
+                disabled={isLoading}
+                className="px-4 py-2 bg-[#5eead4] text-black font-bold text-sm rounded hover:bg-[#4dd4c4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                SEND
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* How Built Modal */}
       <HowBuiltModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        </>
+      )}
     </div>
   );
 }
