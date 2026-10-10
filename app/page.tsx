@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Settings } from 'lucide-react';
+import Hero from '@/components/hero/Hero';
 import RuntimeGraph from '@/components/runtime/RuntimeGraph';
 import ProjectArchitectureView from '@/components/projects/ProjectArchitectureView';
 import HowBuiltModal from '@/components/how-built/HowBuiltModal';
@@ -317,39 +318,15 @@ function HomeContent() {
 
   return (
     <div className="min-h-screen bg-[#0a0e0f] text-[#e5e5e5] font-mono grid-bg">
-      {/* LANDING PAGE */}
+      {/* HERO SECTION */}
       {showLanding && (
-        <div className="fixed inset-0 bg-[#0a0e0f] z-50 flex items-center justify-center">
-          <div className="text-center max-w-2xl px-6">
-            <p className="text-xl text-gray-400 mb-1 tracking-widest">AhmedOS// Agent Runtime</p>
-            <h2 className="text-4xl font-bold text-white mb-4">AHMED ABBAS</h2>
-            <p className="text-lg text-gray-400 mb-2">Full Stack AI Engineer</p>
-            <p className="text-sm text-gray-500 mb-6">React · Cloudflare · Generative AI</p>
-            <p className="text-base text-gray-300 mb-8 max-w-lg mx-auto">
-              I build software, AI systems and products end-to-end.
-            </p>
-            <p className="text-sm text-gray-400 mb-8 italic">
-              This isn't a portfolio that tells you about me. It's a system that lets you investigate me.
-            </p>
-            <div className="flex gap-4 justify-center">
-              <button 
-                onClick={() => setShowAboutPanel(!showAboutPanel)}
-                className="px-8 py-3 bg-[#5eead4] text-black font-bold rounded hover:bg-[#4dd4c4] transition-colors"
-              >
-                {showAboutPanel ? 'Hide Me' : 'About Me'}
-              </button>
-              <button 
-                onClick={() => {
-                  setShowLanding(false);
-                  handleAgentClick();
-                }}
-                className="px-8 py-3 border border-[#5eead4] text-[#5eead4] font-bold rounded hover:bg-[#5eead4]/10 transition-colors"
-              >
-                Ask my portfolio
-              </button>
-            </div>
-          </div>
-        </div>
+        <Hero
+          onAboutClick={() => setShowAboutPanel(!showAboutPanel)}
+          onAskClick={() => {
+            setShowLanding(false);
+            handleAgentClick();
+          }}
+        />
       )}
 
       {/* ABOUT ME PANEL - Slide in from right with same content as left panel - only show on landing page */}
